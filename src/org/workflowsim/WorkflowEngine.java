@@ -36,8 +36,11 @@ import org.fog.utils.FogEvents;
 import org.workflowsim.reclustering.ReclusteringEngine;
 import org.workflowsim.scheduling.GASchedulingAlgorithm;
 import org.workflowsim.scheduling.PsoScheduling;
+import org.workflowsim.scheduling.WOARDASchedulingAlgorithm;
 import org.workflowsim.scheduling.WoaScheduling;
 import org.workflowsim.utils.Parameters;
+
+import static org.workflowsim.utils.Parameters.SchedulingAlgorithm.WOA_RDA;
 
 /**
  * WorkflowEngine represents a engine acting on behalf of a user. It hides VM
@@ -101,8 +104,9 @@ public class WorkflowEngine extends SimEntity {
     private WoaScheduling woa;
     private int woaIteration = 0;
     private int woaIndex = 0;
-    
-    
+
+    /* === Attributs WOA === */
+    private WOARDASchedulingAlgorithm woarda;
     
     /**
      * the end time of algorithm
@@ -217,6 +221,14 @@ public class WorkflowEngine extends SimEntity {
                 break;
             case CloudSimTags.CLOUDLET_RETURN:
             	switch (Parameters.getSchedulingAlgorithm()) {
+
+                    //andy
+                    case WOA_RDA: try {
+                        processJobReturnForWOARDA(ev);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
 				case PSO:
 					try {
 						processJobReturnForPSO(ev);
@@ -237,10 +249,9 @@ public class WorkflowEngine extends SimEntity {
 				    try {
 				        processJobReturnForWOA(ev);
 				    } catch (Exception e) {
-				        e.printStackTrace();
-				    }
-				    break;
-
+                        e.printStackTrace();
+                    }
+                    break;
 				case MINMIN:
 				case MAXMIN:
 				case FCFS:
@@ -325,6 +336,25 @@ public class WorkflowEngine extends SimEntity {
             );
 
             System.out.println("[WOA] init: tasks=" + taskNum + " vms=" + vmNum);
+        }
+
+        // ================= INIT WOA-RDA (Andy) =================
+        if (Parameters.getSchedulingAlgorithm() == WOA_RDA && woarda == null) {
+            int taskNum = jobList.size();
+            int vmNum = getAllVmList().size();
+
+            woaIteration = 0;
+            woaIndex = 0;
+
+            // Initialisation de votre algorithme hybride
+            woarda = new WOARDASchedulingAlgorithm(
+                    Parameters.getWoaPopulationSize(),
+                    Parameters.getWoaMaxIterations(),
+                    taskNum,
+                    vmNum
+            );
+
+            System.out.println("[WOA-RDA] init: tasks=" + taskNum + " vms=" + vmNum);
         }
 
         if(getoffloadingEngine().getOffloadingStrategy() != null){
@@ -457,9 +487,91 @@ public class WorkflowEngine extends SimEntity {
     }
 
 // ajout edner
-    
-    
-    
+
+    /**
+     * Andy
+     * @param ev
+     */
+    protected void processJobReturnForWOARDA(SimEvent ev) throws Exception {
+        Job job = (Job) ev.getData();
+
+        // 1. Gestion des échecs de tâches (standard WorkflowSim)
+        if (job.getCloudletStatus() == Cloudlet.FAILED) {
+            int newId = getJobsList().size() + getJobsSubmittedList().size();
+            getJobsList().addAll(ReclusteringEngine.process(job, newId));
+        }
+
+        getJobsReceivedList().add(job);
+        jobsSubmitted--;
+
+        // 2. Vérifier si l'exécution de la meilleure solution finale est terminée
+        if (WorkflowEngine.startlastSchedule == 1) {
+            double finalFit = caculatefitness();
+            System.out.println("[WOA-RDA] Simulation finale terminée. Fitness : " + finalFit);
+            sendNow(controllerId, FogEvents.STOP_SIMULATION, null);
+            return;
+        }
+
+        // 3. Si le workflow n'est pas encore fini (il reste des jobs à traiter pour cet individu)
+        if (!(getJobsList().isEmpty() && jobsSubmitted == 0)) {
+            sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+            return;
+        }
+
+        // 4. --- FIN D'UN RUN COMPLET POUR UN INDIVIDU ---
+        // On enregistre la fitness obtenue par la simulation réelle
+        double currentFitness = caculatefitness();
+        woarda.setFitness(woaIndex, currentFitness);
+
+        woaIndex++; // On passe à l'individu suivant
+
+        // 5. Cas A : Il reste des individus à tester dans la population actuelle
+        if (woaIndex < woarda.getPopSize()) {
+            init(); // ÉTAPE CRUCIALE : Nettoyage pour la prochaine simulation (Doc Step ⑤)
+
+            // On informe les brokers qu'on passe à l'individu suivant (Mode INIT ou UPDATE)
+            for (int i = 0; i < getSchedulers().size(); i++) {
+                getScheduler(i).setWoaState(FogBroker.WOA_UPDATE);
+            }
+
+            sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+            return;
+        }
+
+        // 6. Cas B : Toute la population a été testée -> Fin de l'itération (Génération)
+        woaIteration++;
+        woaIndex = 0;
+
+        if (woaIteration < Parameters.getWoaMaxIterations()) {
+            // Appliquer les mises à jour mathématiques WOA et les mécanismes RDA (Brame/Combat)
+            woarda.updatePopulation(woaIteration, Parameters.getWoaMaxIterations());
+
+            System.out.println("[WOA-RDA] Itération " + woaIteration + " terminée.");
+
+            init(); // Nettoyage avant de recommencer la nouvelle génération
+
+            for (int i = 0; i < getSchedulers().size(); i++) {
+                getScheduler(i).setWoaState(FogBroker.WOA_UPDATE);
+            }
+
+            sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+            return;
+        }
+
+        // 7. Cas C : Toutes les itérations sont finies -> Lancer le meilleur individu historique
+        System.out.println("[WOA-RDA] Optimisation terminée. Meilleure fitness trouvée : " + woarda.getGBestFitness());
+
+        init();
+
+        // On passe le broker en mode "GBEST" pour appliquer la meilleure solution
+        for (int i = 0; i < getSchedulers().size(); i++) {
+            getScheduler(i).setWoaState(FogBroker.WOA_GBEST);
+        }
+
+        WorkflowEngine.startlastSchedule = 1; // Marqueur pour arrêter la simulation au prochain retour
+        sendNow(this.getId(), CloudSimTags.CLOUDLET_SUBMIT, null);
+    }
+
     
     
     protected void processJobReturnForPSO(SimEvent ev) throws Exception {
@@ -939,13 +1051,51 @@ public class WorkflowEngine extends SimEntity {
     }
     //rajout par edner (ligne 917--924)
     public double[] getWoaCurrentSchedule() {
-        return woa.getWhale(woaIndex); // la whale courante
+        return woarda.getWhale(woaIndex); // la whale courante
     }
 
     public double[] getWoaBestSchedule() {
-        return woa.getBestWhale(); // best globale
+        return woarda.getBestWhale(); // best globale
     }
 
+    // Pour WOA-RDA (Andy)
+    /**
+     * Récupère le planning de l'individu (cerf/baleine) actuel
+     */
+    public double[] getWoaRDACurrentSchedule() {
+        if (woarda == null) return null;
+
+        int[] schedule = woarda.getSchedule(woaIndex);
+        double[] dSchedule = new double[schedule.length];
+        for(int i = 0; i < schedule.length; i++) {
+            dSchedule[i] = (double) schedule[i];
+        }
+        return dSchedule;
+    }
+
+    /**
+     * Récupère le meilleur planning global trouvé par WOA-RDA
+     */
+    public double[] getWoaRDABestSchedule() {
+        if (woarda == null) return null;
+
+        int[] schedule = woarda.getGBestSchedule();
+        double[] dSchedule = new double[schedule.length];
+        for(int i = 0; i < schedule.length; i++) {
+            dSchedule[i] = (double) schedule[i];
+        }
+        return dSchedule;
+    }
+
+    //andy
+    public WOARDASchedulingAlgorithm getWOARDA() {
+        return this.woarda;
+    }
+
+    //andy
+    public int getWoaIndex() {
+        return this.woaIndex;
+    }
 
     /*
      * (non-Javadoc)

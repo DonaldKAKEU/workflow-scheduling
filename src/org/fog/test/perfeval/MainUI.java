@@ -114,7 +114,7 @@ import jxl.write.biff.RowsExceededException;
 
 @SuppressWarnings("serial")
 public class MainUI extends JFrame {
-	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","GA","WOA"};
+	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","GA","WOA","WOA_RDA"};
 	final static String[] objectiveStr = new String[]{"Time","Energy","Cost"};
 	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht"};
 	final static String[] nodeSizeStr = new String[]{};
@@ -173,6 +173,7 @@ public class MainUI extends JFrame {
 	private final JCheckBox chckbxGa = new JCheckBox("GA");
 	private final JCheckBox chckbxPso = new JCheckBox("PSO");
 	private final JCheckBox chckbxWoa = new JCheckBox("WOA");  // Ajout Edner
+	private final JCheckBox chckbxWoarda = new JCheckBox("WOA_RDA");  // andy
 	static List<JCheckBox> CheckBoxList = new ArrayList<JCheckBox>();
 	private final JRadioButton rdbtnTime = new JRadioButton("Time",true);
 	private final JRadioButton rdbtnEnergy = new JRadioButton("Energy");
@@ -572,7 +573,14 @@ public class MainUI extends JFrame {
 		chckbxWoa.setBounds(154, 116, 68, 23);
 		CheckBoxList.add(chckbxWoa);
 		panel_2.add(chckbxWoa);
-		
+
+		//================= andy ================//
+		chckbxWoarda.setFont(new Font("Consolas", Font.PLAIN, 12));
+		chckbxWoarda.setBackground(Color.WHITE);
+		chckbxWoarda.setBounds(226, 116, 80, 23);
+		CheckBoxList.add(chckbxWoarda);
+		panel_2.add(chckbxWoarda);
+
 		chckbxGa.setFont(new Font("Consolas", Font.PLAIN, 12));
 		chckbxGa.setBackground(Color.WHITE);
 		chckbxGa.setBounds(82, 116, 68, 23);
@@ -1132,6 +1140,8 @@ public class MainUI extends JFrame {
 			 return 6.0;
 		else if(scheduler_method.equals(algrithmStr[6])) 
 			return 7.0; // WOA rajouté par Edner
+		else if (scheduler_method.equals(algrithmStr[7]))
+			return 8.0; //andy
 		 return null;
 	}
 	

@@ -167,6 +167,15 @@ public class FogBroker extends PowerDatacenterBroker{
 				        processCloudletUpdateForWOAGbest(ev);
 				    }
 				    break;
+                    case WOA_RDA: // rajout andy
+                        if (woaState == WOA_INIT) {
+                            processCloudletUpdateForWOARDAInit(ev);
+                        } else if (woaState == WOA_UPDATE) {
+                            processCloudletUpdateForWOARDAUpdate(ev);
+                        } else { // WOA_GBEST
+                            processCloudletUpdateForWOARDAGbest(ev);
+                        }
+                        break;
 
 				case MINMIN:
 				case MAXMIN:
@@ -447,6 +456,81 @@ public class FogBroker extends PowerDatacenterBroker{
         cloudletsSubmitted += scheduledList.size();
     }
 
+    /**
+     * Étape ⑦ : Assignation initiale (Population de départ)
+     */
+    protected void processCloudletUpdateForWOARDAInit(SimEvent ev) {
+        List<Cloudlet> cloudletList = getCloudletList();
+        WorkflowEngine engine = (WorkflowEngine) CloudSim.getEntity(workflowEngineId);
+
+        // On récupère le planning de la baleine/cerf actuel
+        double[] schedule = engine.getWoaCurrentSchedule();
+
+        submitScheduledTasks(cloudletList, schedule);
+    }
+
+    /**
+     * Étape ⑧ : Assignation après mise à jour (WOA + RDA Combat/Roaring)
+     */
+    protected void processCloudletUpdateForWOARDAUpdate(SimEvent ev) {
+        List<Cloudlet> cloudletList = getCloudletList();
+        WorkflowEngine engine = (WorkflowEngine) CloudSim.getEntity(workflowEngineId);
+
+        // Récupère le planning après les mouvements WOA et le local search RDA
+        double[] schedule = engine.getWoaCurrentSchedule();
+
+        submitScheduledTasks(cloudletList, schedule);
+    }
+
+    /**
+     * Étape ⑨ : Assignation du meilleur résultat final (Global Best)
+     */
+    protected void processCloudletUpdateForWOARDAGbest(SimEvent ev) {
+        List<Cloudlet> cloudletList = getCloudletList();
+        WorkflowEngine engine = (WorkflowEngine) CloudSim.getEntity(workflowEngineId);
+
+        // Récupère la meilleure solution historique (Best Whale / Best Deer)
+        double[] schedule = engine.getWoaBestSchedule();
+
+        submitScheduledTasks(cloudletList, schedule);
+    }
+
+    /**
+     * Méthode utilitaire de soumission (Logique commune)
+     */
+    private void submitScheduledTasks(List<Cloudlet> cloudletList, double[] schedule) {
+        List<Cloudlet> scheduledList = new ArrayList<Cloudlet>();
+
+        for (int i = 0; i < cloudletList.size(); i++) {
+            Cloudlet cl = cloudletList.get(i);
+            int cloudletId = cl.getCloudletId();
+
+            // On caste en int car le tableau stocke des doubles (ID de la VM)
+            int vmId = (int) schedule[cloudletId];
+
+            // Respect de l'offloading/sélection de VM
+            vmId = ChooseVm(cl, vmId);
+
+            cl.setVmId(vmId);
+            scheduledList.add(cl);
+        }
+
+        // Envoi effectif aux Datacenters avec gestion du délai
+        for (Cloudlet cloudlet : scheduledList) {
+            int vmId = cloudlet.getVmId();
+            double delay = 0.0;
+            if (Parameters.getOverheadParams().getQueueDelay() != null) {
+                delay = Parameters.getOverheadParams().getQueueDelay(cloudlet);
+            }
+            // Soumission au datacenter qui possède la VM
+            schedule(getVmsToDatacentersMap().get(vmId), delay, CloudSimTags.CLOUDLET_SUBMIT, cloudlet);
+        }
+
+        // Mise à jour des listes internes du Broker
+        getCloudletList().removeAll(scheduledList);
+        getCloudletSubmittedList().addAll(scheduledList);
+        cloudletsSubmitted += scheduledList.size();
+    }
     /**
      * Update a cloudlet (job)
      * 每接收到一个任务以后，调用此方法，设置提交到调度机上的任务，以及调度机绑定的虚拟机，并为cloudlets分配虚拟机
