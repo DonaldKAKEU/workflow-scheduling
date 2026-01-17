@@ -256,7 +256,8 @@ public final class WorkflowParser {
                         }
                         task.setFileList(mFileList);
                         this.getTaskList().add(task);
-
+                        System.out.println("Task " + nodeName + " with length " + length + " created.");
+                        System.out.println("TaskList size: " + this.getTaskList().size());
                         /**
                          * Add dependencies info.
                          */

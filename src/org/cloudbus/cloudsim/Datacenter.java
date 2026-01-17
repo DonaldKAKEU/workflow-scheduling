@@ -1104,7 +1104,7 @@ public class Datacenter extends SimEntity {
 	 * 
 	 * @return the characteristics
 	 */
-	protected DatacenterCharacteristics getCharacteristics() {
+	public DatacenterCharacteristics getCharacteristics() {
 		return characteristics;
 	}
 

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -91,13 +92,13 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.ClassType;
 import org.workflowsim.utils.ReplicaCatalog;
 
-import com.mathworks.toolbox.javabuilder.MWArray;
-import com.mathworks.toolbox.javabuilder.MWClassID;
-import com.mathworks.toolbox.javabuilder.MWComplexity;
-import com.mathworks.toolbox.javabuilder.MWNumericArray;
+// import com.mathworks.toolbox.javabuilder.MWArray;
+// import com.mathworks.toolbox.javabuilder.MWClassID;
+// import com.mathworks.toolbox.javabuilder.MWComplexity;
+// import com.mathworks.toolbox.javabuilder.MWNumericArray;
 
-import drawbar.DrawBar;
-import drawplot2.DrawPicture;
+// import drawbar.DrawBar;
+// import drawplot2.DrawPicture;
 import jxl.Workbook;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
@@ -116,7 +117,7 @@ import jxl.write.biff.RowsExceededException;
 public class MainUI extends JFrame {
 	final static String[] algrithmStr = new String[]{"MINMIN","MAXMIN","FCFS","ROUNDROBIN","PSO","GA"};
 	final static String[] objectiveStr = new String[]{"Time","Energy","Cost"};
-	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht"};
+	final static String[] inputTypeStr = new String[]{"Montage","CyberShake","Epigenomics","Inspiral","Sipht","task"};
 	final static String[] nodeSizeStr = new String[]{};
 	final static String[] cloudNumStr = new String[]{null,"1","2","3","4","5"};
 	final static String[] edgeNumStr = new String[]{null,"1","2","3","4","5"};
@@ -607,6 +608,8 @@ public class MainUI extends JFrame {
 		inputTypeCb.setFont(new Font("Consolas", Font.PLAIN, 12));
 		inputTypeCb.setBounds(75, 39, 109, 21);
 		panel_1.add(inputTypeCb);
+
+		// Ici où on choisis le data set à utiliser
 		for(String str : getFiles((String)inputTypeCb.getSelectedItem()))
 			nodeSizeCb.addItem(str);
 		
@@ -646,87 +649,87 @@ public class MainUI extends JFrame {
 		panel_1.add(inputDL);
 	}
 	
-	@SuppressWarnings("finally")
-	protected static int drawplot(int num, ArrayList<Double> fitness,String xz,String yz) {
-        MWNumericArray x = null; // 存放x值的数组
-        MWNumericArray y = null; // 存放y值的数组
-        DrawPicture plot = null; // 自定义plotter实例，即打包时所指定的类名，根据实际情况更改
+// 	@SuppressWarnings("finally")
+// 	protected static int drawplot(int num, ArrayList<Double> fitness,String xz,String yz) {
+//         MWNumericArray x = null; // 存放x值的数组
+//         MWNumericArray y = null; // 存放y值的数组
+//         DrawPicture plot = null; // 自定义plotter实例，即打包时所指定的类名，根据实际情况更改
          
-        int n = num;//做图点数  横坐标
-        try {
-            int[] dims = {1, n};//几行几列
-            x = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
-            y = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//         int n = num;//做图点数  横坐标
+//         try {
+//             int[] dims = {1, n};//几行几列
+//             x = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//             y = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
              
-            for(int i = 1; i <= n; i++) {
-                x.set(i,i);
-                y.set(i, fitness.get(i-1));
-            }
+//             for(int i = 1; i <= n; i++) {
+//                 x.set(i,i);
+//                 y.set(i, fitness.get(i-1));
+//             }
              
-            //初始化plotter
-            plot = new DrawPicture();
+//             //初始化plotter
+//             plot = new DrawPicture();
              
-            //做图
-            plot.drawplot(x, y, xz, yz);// 在脚本文件中的函数名，根据实际情更改
-            plot.waitForFigures();// 不调用该句，无法弹出绘制图形窗口
+//             //做图
+//             plot.drawplot(x, y, xz, yz);// 在脚本文件中的函数名，根据实际情更改
+//             plot.waitForFigures();// 不调用该句，无法弹出绘制图形窗口
              
-        } catch (Exception e1) {
-            // TODO: handle exception
-        } finally {
-            MWArray.disposeArray(x);
-            MWArray.disposeArray(y);
-            if(plot != null) {
-                plot.dispose();
-            }
-            return 1;
-        }
-   }
+//         } catch (Exception e1) {
+//             // TODO: handle exception
+//         } finally {
+//             MWArray.disposeArray(x);
+//             MWArray.disposeArray(y);
+//             if(plot != null) {
+//                 plot.dispose();
+//             }
+//             return 1;
+//         }
+//    }
 	
-	@SuppressWarnings("finally")
-	protected static int drawbar(List<Double[]> record) {
-        MWNumericArray x = null; // 存放x值的数组
-        MWNumericArray y1 = null; // 存放y1值的数组
-        MWNumericArray y2 = null; // 存放y2值的数组
-        MWNumericArray y3 = null; // 存放y3值的数组
-        DrawBar plot = null; // 自定义plotter实例，即打包时所指定的类名，根据实际情况更改
+// 	@SuppressWarnings("finally")
+// 	protected static int drawbar(List<Double[]> record) {
+//         MWNumericArray x = null; // 存放x值的数组
+//         MWNumericArray y1 = null; // 存放y1值的数组
+//         MWNumericArray y2 = null; // 存放y2值的数组
+//         MWNumericArray y3 = null; // 存放y3值的数组
+        // DrawBar plot = null; // 自定义plotter实例，即打包时所指定的类名，根据实际情况更改
 
-        int n = record.size();//做图点数  横坐标
+//         int n = record.size();//做图点数  横坐标
         
-        try {
-            int[] dims = {n, 1};//几行几列
-            x = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
-            y1 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
-            y2 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
-            y3 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//         try {
+//             int[] dims = {n, 1};//几行几列
+//             x = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//             y1 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//             y2 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
+//             y3 = MWNumericArray.newInstance(dims, MWClassID.DOUBLE, MWComplexity.REAL);
             
-            for(int i = 1; i <= n ; i++){
-            	Double[] data = record.get(i-1);
-            	x.set(i, data[0]);//Algorithm     将矩阵中第i个数设置成某个值
-            	y1.set(i, data[1]);//Time
-            	y2.set(i, data[2]);//Energy
-            	y3.set(i, data[3]);//Cost
-            }
+//             for(int i = 1; i <= n ; i++){
+//             	Double[] data = record.get(i-1);
+//             	x.set(i, data[0]);//Algorithm     将矩阵中第i个数设置成某个值
+//             	y1.set(i, data[1]);//Time
+//             	y2.set(i, data[2]);//Energy
+//             	y3.set(i, data[3]);//Cost
+//             }
             
-            //初始化plotter
-            plot = new DrawBar();
+//             //初始化plotter
+//             plot = new DrawBar();
             
-            //做图
-            plot.drawbar(x, y1, y2, y3);// 在脚本文件中的函数名，根据实际情更改
-            plot.waitForFigures();// 不调用该句，无法弹出绘制图形窗口
+//             //做图
+//             plot.drawbar(x, y1, y2, y3);// 在脚本文件中的函数名，根据实际情更改
+//             plot.waitForFigures();// 不调用该句，无法弹出绘制图形窗口
              
-        } catch (Exception e1) {
-            // TODO: handle exception
-        } finally {
-            MWArray.disposeArray(x);
-            MWArray.disposeArray(y1);
-            MWArray.disposeArray(y2);
-            MWArray.disposeArray(y3);
-            if(plot != null) {
-                plot.dispose();
-            }
-            return 1;
-        }
-   }
+//         } catch (Exception e1) {
+//             // TODO: handle exception
+//         } finally {
+//             MWArray.disposeArray(x);
+//             MWArray.disposeArray(y1);
+//             MWArray.disposeArray(y2);
+//             MWArray.disposeArray(y3);
+//             if(plot != null) {
+//                 plot.dispose();
+//             }
+//             return 1;
+//         }
+//    }
         
 	 private class JMHandler implements ActionListener,ItemListener  
 	    {
@@ -778,7 +781,8 @@ public class MainUI extends JFrame {
 		            			System.out.println("Drawing "+scheduler_method+" iteration figure......");
 		            			showDialog("Drawing", "information");
 		            			Flag = false;
-			            		drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
+								System.out.println("drawplot function is disabled");
+			            		// drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
 			            		Flag = true;
 			            		System.out.println("Finished drawing");
 		            		}
@@ -814,8 +818,9 @@ public class MainUI extends JFrame {
 		            			System.out.println("Drawing "+scheduler_method+" iteration figure......");
 		            			showDialog("Drawing", "information");
 		            			Flag = false;
-			            		drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
-			            		Flag = true;
+			            		// drawplot(wfEngine.iterateNum, wfEngine.updatebest, "Iterations", optimize_objective);
+			            		System.out.println("drawplot function is disabled");
+								Flag = true;
 			            		System.out.println("Finished drawing");
 		            		}
 		            	}
@@ -920,7 +925,8 @@ public class MainUI extends JFrame {
 	            	if(!record.isEmpty()){
 	            		System.out.println("Drawing algorithms comparison bar......");
 	            		showDialog("Drawing", "information");
-	            		drawbar(record);
+	            		// drawbar(record);
+						System.out.println("drawbar function is disabled");
 	            		Flag = true;
 	            		System.out.println("Finished drawing");
 	            	}
@@ -935,12 +941,28 @@ public class MainUI extends JFrame {
 	    			String itemSize = (String) e.getItem();
 	    			mobileNum = Integer.parseInt(itemSize);
 	    			for(int i = 0; i < mobileNum; i++) {
-    					ImageIcon icon = new ImageIcon(getClass().getResource("/images/mobile.jpg"));
-    					icon.setImage(icon.getImage().getScaledInstance(30, 50, Image.SCALE_DEFAULT));
-    					JLabel jLabel = new JLabel(icon); 
-    					mobilePanel.add(jLabel);
-    					validate();
-    					repaint();
+						String imagePath = "/images/mobile.jpg";
+						// print current path for debugging
+						System.out.println("Current working directory: " + System.getProperty("user.dir"));
+						java.net.URL imgUrl = getClass().getResource(imagePath);
+						if (imgUrl != null) {
+							// Original code
+							ImageIcon icon = new ImageIcon(imgUrl);
+							icon.setImage(icon.getImage().getScaledInstance(30, 50, Image.SCALE_DEFAULT));
+							JLabel jLabel = new JLabel(icon);
+							mobilePanel.add(jLabel);
+							validate();
+							repaint();
+						} else {
+							// Print error so you know which file is missing
+							System.err.println("CRITICAL ERROR: Could not find image at: " + imagePath);
+						}
+    					// ImageIcon icon = new ImageIcon(getClass().getResource("/images/mobile.jpg"));
+    					// icon.setImage(icon.getImage().getScaledInstance(30, 50, Image.SCALE_DEFAULT));
+    					// JLabel jLabel = new JLabel(icon); 
+    					// mobilePanel.add(jLabel);
+    					// validate();
+    					// repaint();
     				}
 	    		}
 	        }else if(e.getItemSelectable() == edgeNumCb) {
@@ -950,12 +972,26 @@ public class MainUI extends JFrame {
 		    			String itemSize = (String) e.getItem();
 		    			fogServerNum = Integer.parseInt(itemSize);
 		    			for(int i = 0; i < fogServerNum; i++) {
-	    					ImageIcon icon = new ImageIcon(getClass().getResource("/images/fogServer.jpg"));
-	    					icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
-	    					JLabel jLabel = new JLabel(icon); 
-	    					fogPanel.add(jLabel);
-	    					validate();
-	    					repaint();
+							String imagePath = "/images/fogServer.jpg";
+							java.net.URL imgUrl = getClass().getResource(imagePath);
+							if (imgUrl != null) {
+								// Original code
+								ImageIcon icon = new ImageIcon(imgUrl);
+								icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
+								JLabel jLabel = new JLabel(icon);
+								fogPanel.add(jLabel);
+								validate();
+								repaint();
+							} else {
+								// Print error so you know which file is missing
+								System.err.println("CRITICAL ERROR: Could not find image at: " + imagePath);
+							}
+	    					// ImageIcon icon = new ImageIcon(getClass().getResource("/images/fogServer.jpg"));
+	    					// icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
+	    					// JLabel jLabel = new JLabel(icon); 
+	    					// fogPanel.add(jLabel);
+	    					// validate();
+	    					// repaint();
 	    				}
 		    		}
 	        		
@@ -966,12 +1002,27 @@ public class MainUI extends JFrame {
 		    			String itemSize = (String) e.getItem();
 		    			cloudNum = Integer.parseInt(itemSize);
 		    			for(int i = 0; i < cloudNum; i++) {
-	    					ImageIcon icon = new ImageIcon(getClass().getResource("/images/cloudServer.jpg"));
-	    					icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
-	    					JLabel jLabel = new JLabel(icon);
-	    					cloudPanel.add(jLabel);
-	    					validate();
-	    					repaint();
+							String imagePath = "/images/cloudServer.jpg";
+							java.net.URL imgUrl = getClass().getResource(imagePath);
+
+							if (imgUrl != null) {
+								// Original code
+								ImageIcon icon = new ImageIcon(imgUrl);
+								icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
+								JLabel jLabel = new JLabel(icon);
+								cloudPanel.add(jLabel);
+								validate();
+								repaint();
+							} else {
+								// Print error so you know which file is missing
+								System.err.println("CRITICAL ERROR: Could not find image at: " + imagePath);
+							}
+	    					// ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+	    					// icon.setImage(icon.getImage().getScaledInstance(40, 50, Image.SCALE_DEFAULT));
+	    					// JLabel jLabel = new JLabel(icon);
+	    					// cloudPanel.add(jLabel);
+	    					// validate();
+	    					// repaint();
 	    				}	
 		    		}
 	        	}else if(e.getItemSelectable()==selectdisplay){
@@ -1330,10 +1381,11 @@ public class MainUI extends JFrame {
 	     *
 	     * @param list list of jobs
 	     */
-	    protected static void printJobList(String algorithm, List<Job> list) {
+	    protected static ArrayList<Integer> printJobList(String algorithm, List<Job> list) {
 	        DecimalFormat dft = new DecimalFormat("######0.00");
 	        Object[][] rowData = new Object[nodeSize+1][];
 	        int i = 0 , n = 1;
+			ArrayList<Integer> VMAssigned = new ArrayList<>(Collections.nCopies(list.size(), -1));
 	        
 	        for (Job job : list) {
 	        	Collection<String> data =new ArrayList<String>(); 
@@ -1345,7 +1397,21 @@ public class MainUI extends JFrame {
 	            	data.add(Integer.toString(task.getCloudletId()));
 	            }
 
-	            if (job.getCloudletStatus() == Cloudlet.SUCCESS) {          	
+	            if (job.getCloudletStatus() == Cloudlet.SUCCESS) {  
+					if (job.getTaskList().size() >= 1){
+					// 	System.out.println("----------------------------------------");
+					// 	System.out.println("Job list: " + job.getTaskListString() +" with size : "+job.getTaskList().size());  
+					// 	System.out.println("Task " + job.getTaskId(0) + " with caracteristics : "+job.getCaract() + ": was Assigned to VM: " + job.getVmId() 
+					// 	+ " process_time: " + job.getActualCPUTime() +" energy: " + " with sucess "); 
+						VMAssigned.set(job.getTaskId(0), job.getVmId());
+					// 	System.out.println("VM List Assignment: ");
+					// 	System.out.println(
+					// 		VMAssigned.stream()
+					// 			.map(String::valueOf)
+					// 			.collect(Collectors.joining(", "))
+					// 	);
+					// 	System.out.println("----------------------------------------");
+										}
 	            	data.add("SUCCESS");
 	            	data.add(job.getResourceName(job.getResourceId()));
 	            	data.add(Integer.toString(job.getVmId()));
@@ -1392,6 +1458,7 @@ public class MainUI extends JFrame {
 	        outputs.put(algorithm, rowData);
 	        selectdisplay.addItem(algorithm);
 	        selectdisplay.setSelectedItem(algorithm);
+			return VMAssigned;
 	    }
 	    
 	    protected static void printJobList(List<Job> list) {
@@ -1419,6 +1486,7 @@ public class MainUI extends JFrame {
 	            //Log.print(indent);
 
 	            if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
+					System.out.println("Task " + job.getCloudletId() + ": was Assigned to VM: " + job.getVmId() + " with sucess");
 	            	formatter.format(" SUCCESS\t%-16s\t%-9d\t%-10.2f\t%-12.2f\t%-13.2f\t%-8d\t%-12.2f\t",
 	            			job.getResourceName(job.getResourceId()),job.getVmId(),
 	            			job.getActualCPUTime(),job.getExecStartTime(),
@@ -1494,6 +1562,8 @@ public class MainUI extends JFrame {
 	            System.out.println("write out to: "+filename);
 	        } catch (FileNotFoundException e) {
 	            JOptionPane.showMessageDialog(null, "Please close the running excel");
+	        } catch (WriteException e) {
+	            e.printStackTrace();
 	        }
 	    }
                                                                                                                                                                                                                                                                                                                       
@@ -1577,6 +1647,7 @@ public class MainUI extends JFrame {
 	        for (Integer integer : node) {
 	    	    files.add(Integer.toString(integer));
 	    	}
+			System.out.println("Available node sizes for "+filename+" : "+files);
 		    return files;
 		}
 		
@@ -1612,9 +1683,16 @@ public class MainUI extends JFrame {
         	List<Job> outputList0 = wfEngine.getJobsReceivedList();
             CloudSim.stopSimulation();
             Log.enable();
-            printJobList(scheduler_method, outputList0);
+            ArrayList<Integer> VMassignedList = printJobList(scheduler_method, outputList0);
 //            printJobList(outputList0);
             controller.print();
+			System.out.println("VM List Assignment: ");
+			System.out.println(
+				VMassignedList.stream()
+					.map(String::valueOf)
+					.collect(Collectors.joining(", "))
+			);
+			Log.printLine("=========================================================v2");
             Double[] a = {getAlgorithm(scheduler_method),controller.TotalExecutionTime,controller.TotalEnergy,controller.TotalCost};
             record.add(a);
             return wfEngine.algorithmTime;

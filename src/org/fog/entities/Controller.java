@@ -71,6 +71,17 @@ public class Controller extends SimEntity{
 	double WAN_Bandwidth = 40;//Mbps
 	final double parameter = 10000;//计算传输数据的传输时间的调整参数
 	int count1=0, count2=0, count3=0;
+
+    // Custom metrics to be calculated at the end of simulation
+    public double customTotalExecutionTime; // Makespan
+    public double customTotalCost;          // Total Cost
+    public double customTotalEnergy;        // Total Energy
+
+    // C_transfer: Cost of transfer per unit of data/time (Assumed value, adjust as needed)
+    private static final double C_TRANSFER = 0.05; 
+    
+    // Average Bandwidth assumption if link specific not available (Mbps -> converted to bits/sec in logic)
+    private double AVERAGE_BW = 100.0;
 	
 	public Controller(String name, List<FogDevice> fogDevices , WorkflowEngine Engine) {
 		super(name);
@@ -80,8 +91,10 @@ public class Controller extends SimEntity{
 		setFogDevices(fogDevices);
 		wfEngine = Engine;
 		wfEngine.setcontrollerId(this.getId());
+
 		offloadingEngine = wfEngine.getoffloadingEngine();
 		offloadingEngine.setfogDevices(fogDevices);
+
 		TotalExecutionTime=0.0;
 		TotalEnergy=0.0;
 		TotalCost=0.0;
@@ -96,18 +109,8 @@ public class Controller extends SimEntity{
 		return null;
 	}
 	
-	@Override
-	public void startEntity() {
-
-//		Log.printLine("Starting FogWorkflowSim version 1.0");
-		//send(getId(), Config.RESOURCE_MANAGE_INTERVAL, FogEvents.CONTROLLER_RESOURCE_MANAGE);
-		
-		//send(getId(), Config.MAX_SIMULATION_TIME, FogEvents.STOP_SIMULATION);
-		
-		//for(FogDevice dev : getFogDevices())
-		//	sendNow(dev.getId(), FogEvents.RESOURCE_MGMT);
-
-	}
+    @Override
+    public void startEntity() {}
 
 	@Override
 	public void processEvent(SimEvent ev) {
@@ -118,11 +121,138 @@ public class Controller extends SimEntity{
 		case FogEvents.STOP_SIMULATION:
 			shutdownEntity();
 			CloudSim.clearEvent();
-			updateExecutionTime();
+			updateExecutionResults();
 			CloudSim.stopSimulation();
 			break;
 		}
 	}
+
+    public void updateExecutionResults() {
+        // 1. Makespan = max(ET_i)
+        customTotalExecutionTime = CloudSim.clock();
+
+        // 2. Total Cost = Processing Cost + Communication Cost
+        customTotalCost = calculateTotalCost();
+
+        // 3. Total Energy = Active Energy + Idle Energy (for all devices)
+        customTotalEnergy = calculateTotalEnergy();
+    }
+
+    /**
+     * Calculates Cost based on:
+     * Cost = sum(CT_i * C^proc_j) + sum(Comm_Cost)
+     */
+    private double calculateTotalCost() {
+        double processingCost = 0.0;
+        double communicationCost = 0.0;
+        
+        List<Job> jobList = wfEngine.getJobsReceivedList();
+
+        for (Job job : jobList) {
+            CondorVM vm = getVm(job.getVmId());
+            if (vm == null) continue;
+
+            // --- A. Processing Cost ---
+            // Formula: CT_i * C^proc_j
+            // CT_i = Actual CPU Time
+            // C^proc_j = Cost per Second of the VM (derived from Host/Datacenter characteristics)
+            double CT_i = job.getActualCPUTime();
+            double C_proc_j = vm.getHost().getDatacenter().getCharacteristics().getCostPerSecond();
+            
+            processingCost += (CT_i * C_proc_j);
+
+            // --- B. Communication Cost ---
+            // Formula: If diff VM: (Dout / BW) * C_transfer
+            // We look at the job's parents (Predecessors) to find data transfer
+            List<Task> parents = job.getParentList();
+            for (Task parent : parents) {
+                Job parentJob = (Job) parent; // Cast Task to Job
+                
+                // If on different VMs (or one is on mobile, one on cloud, etc.)
+                if (parentJob.getVmId() != job.getVmId()) {
+                    
+                    // Volume of data (D_out of parent -> D_in of current)
+                    // We sum up files that are OUTPUT in parent and INPUT in child
+                    double dataSizeKbits = getTransferDataSize(parentJob, job) * 8 / 1024; // Convert bytes to kbits
+                    
+                    // Bandwidth (Mbps)
+                    // Simplified: Using average BW or retrieving from VM
+                    double bwMbps = vm.getBw() / 1000.0; // Assuming getBw is in Kbps, convert to Mbps
+                    if(bwMbps <= 0) bwMbps = AVERAGE_BW;
+
+                    // Transfer Time
+                    double transferTime = dataSizeKbits / (bwMbps * 1024); // (kbits / kbps) = seconds
+                    
+                    // Cost accumulation
+                    communicationCost += (transferTime * C_TRANSFER);
+                }
+            }
+        }
+        
+        return processingCost + communicationCost;
+    }
+
+    /**
+     * Calculates Energy based on:
+     * Energy = P_active * ActiveTime + P_idle * IdleTime
+     */
+    private double calculateTotalEnergy() {
+        double totalEnergy = 0.0;
+
+        for (FogDevice device : getFogDevices()) {
+            PowerHost host = (PowerHost) device.getHost();
+            FogLinearPowerModel powerModel = (FogLinearPowerModel) host.getPowerModel();
+
+            // P_idle and P_active (max)
+            double P_idle = powerModel.getStaticPower(); 
+            double P_active = powerModel.getMaxPower(); 
+
+            // Calculate Active Time (Sum of execution time of all tasks on this device)
+            double activeTime = 0.0;
+            List<Job> jobList = wfEngine.getJobsReceivedList();
+            for(Job job : jobList){
+                if (getVm(job.getVmId()).getHost().getId() == host.getId()) {
+                    activeTime += job.getActualCPUTime();
+                }
+            }
+
+            // Idle Time = Total Makespan - Active Time
+            double idleTime = TotalExecutionTime - activeTime;
+            if(idleTime < 0) idleTime = 0;
+
+            // Energy for this device
+            // Note: The model says Energy = P_active * Time (during execution). 
+            // Strictly speaking, P_active varies by load. 
+            // Simplified here: Energy = (P_active * activeTime) + (P_idle * idleTime)
+            double calculatedEnergy = (P_active * activeTime) + (P_idle * idleTime);
+
+            
+            // Apply to total
+            totalEnergy += calculatedEnergy;
+            
+            // Update device record for reporting
+            device.setEnergyConsumption(calculatedEnergy);
+        }
+        return totalEnergy;
+    }
+
+    /**
+     * Helper to calculate data size transferred between Parent and Child
+     */
+    private double getTransferDataSize(Job parent, Job child) {
+        double size = 0.0;
+        // Logic: Find files that are Output of Parent and Input of Child
+        for (FileItem pFile : parent.getFileList()) {
+            if (pFile.getType() == FileType.OUTPUT) {
+                for (FileItem cFile : child.getFileList()) {
+                    if (cFile.getType() == FileType.INPUT && cFile.getName().equals(pFile.getName())) {
+                        size += cFile.getSize();
+                    }
+                }
+            }
+        }
+        return size;
+    }
 	
 	private void printNetworkUsageDetails() {
 		System.out.println("Total network usage = "+NetworkUsageMonitor.getNetworkUsage()/Config.MAX_SIMULATION_TIME);		
@@ -225,16 +355,25 @@ public class Controller extends SimEntity{
 	
 	public void print()
 	{
-		Log.printLine();
-		Log.printLine("=========================================================");
-		System.out.println("Algorithm is running "+wfEngine.algorithmTime+"ms");
-		System.out.println("Workflow Makespan = "+TotalExecutionTime);
-		printPowerDetails();
-		printCostDetails();
-		System.out.println("Offloading to Cloud: "+count1+", to Fog: "+count2+", and in mobile: "+count3+".");
-		//printNetworkUsageDetails();
-		Log.printLine("=========================================================");
-		Log.printLine();
+		// Log.printLine();
+		// Log.printLine("=========================================================");
+		// System.out.println("Algorithm is running "+wfEngine.algorithmTime+"ms");
+		// System.out.println("Workflow Makespan = "+TotalExecutionTime);
+		// printPowerDetails();
+		// printCostDetails();
+		// System.out.println("Offloading to Cloud: "+count1+", to Fog: "+count2+", and in mobile: "+count3+".");
+		// //printNetworkUsageDetails();
+		// Log.printLine("=========================================================");
+		// Log.printLine();
+
+        Log.printLine();
+        Log.printLine("v2=========================================================");
+        System.out.println("Algorithm is running id: " + wfEngine.algorithmTime );
+        System.out.println("Workflow Makespan = " + customTotalExecutionTime);
+        System.out.println("Total Energy      = " + customTotalEnergy + " J");
+        System.out.println("Total Cost        = " + customTotalCost + " Euro");
+        
+        Log.printLine();
 	}
 	public void clear()
 	{

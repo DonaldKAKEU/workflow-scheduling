@@ -17,6 +17,7 @@ package org.workflowsim;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Job is an extention to Task. It is basically a group of tasks. In
@@ -75,6 +76,20 @@ public class Job extends Task {
      */
     public List<Task> getTaskList() {
         return this.taskList;
+    }
+
+    public String getTaskListString() {
+        return this.taskList.stream()
+                .map(task -> Integer.toString(task.getCloudletId()))
+                .collect(Collectors.joining(", "));
+    }
+
+    public int getTaskId(int index) {
+        if (this.taskList.isEmpty() || index < 0 || index >= this.taskList.size()) {
+            System.out.println("Error: Task list is empty or index is out of bounds.");
+            return -1; // or throw an exception based on your error handling strategy
+        }
+        return this.taskList.get(index).getCloudletId();
     }
 
     /**
@@ -136,5 +151,9 @@ public class Job extends Task {
     }
     public void setFileSize(double size){
     	this.FileSize = size;
+    }
+
+    public String getCaract() {
+        return "Length: " + this.getCloudletLength() + " FileSize: " + this.getFileSize() + " Inputsize: " + this.getInputsize() + " Outputsize: " + this.getOutputsize();
     }
 }

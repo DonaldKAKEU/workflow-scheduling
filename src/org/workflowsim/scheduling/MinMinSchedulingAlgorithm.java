@@ -18,15 +18,12 @@ package org.workflowsim.scheduling;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.plaf.basic.BasicScrollPaneUI.VSBChangeListener;
 
 import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Job;
 import org.workflowsim.WorkflowSimTags;
 
-import sun.misc.VM;
 
 /**
  * MinMin algorithm.
