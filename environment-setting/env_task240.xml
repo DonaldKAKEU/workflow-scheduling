@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<EnvironmentSetting>
+    <Cloud name="cloud" hostnum="3" bandwidth="40">
+        <host name="host-1" MIPS="4434" cost="0.9013"/>
+        <host name="host-2" MIPS="3344" cost="0.9403"/>
+        <host name="host-3" MIPS="4837" cost="0.8786"/>
+    </Cloud>
+    <EndDevice name="enddevice" hostnum="10" bandwidth="0">
+        <host name="host-1" MIPS="853" cost="0.2253"/>
+        <host name="host-2" MIPS="836" cost="0.252"/>
+        <host name="host-3" MIPS="1105" cost="0.2422"/>
+        <host name="host-4" MIPS="675" cost="0.3817"/>
+        <host name="host-5" MIPS="1095" cost="0.3836"/>
+        <host name="host-6" MIPS="903" cost="0.3815"/>
+        <host name="host-7" MIPS="1123" cost="0.1523"/>
+        <host name="host-8" MIPS="763" cost="0.3895"/>
+        <host name="host-9" MIPS="960" cost="0.2313"/>
+        <host name="host-10" MIPS="1112" cost="0.2085"/>
+    </EndDevice>
+</EnvironmentSetting>

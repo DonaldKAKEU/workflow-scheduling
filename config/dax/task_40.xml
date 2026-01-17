@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adag xmlns="http://pegasus.isi.edu/schema/DAX" version="2.1" name="ExcelWorkflow">
+  <job id="Task_1" namespace="Excel" name="Task" version="1.0" runtime="40.00">
+    <uses file="in_Task_1.dat" link="input" register="false" transfer="true" optional="false" type="data" size="74448896"/>
+    <uses file="out_Task_1.dat" link="output" register="false" transfer="true" optional="false" type="data" size="29360128"/>
+  </job>
+  <job id="Task_2" namespace="Excel" name="Task" version="1.0" runtime="21.00">
+    <uses file="in_Task_2.dat" link="input" register="false" transfer="true" optional="false" type="data" size="46137344"/>
+    <uses file="out_Task_2.dat" link="output" register="false" transfer="true" optional="false" type="data" size="26214400"/>
+  </job>
+  <job id="Task_3" namespace="Excel" name="Task" version="1.0" runtime="45.00">
+    <uses file="in_Task_3.dat" link="input" register="false" transfer="true" optional="false" type="data" size="67108864"/>
+    <uses file="out_Task_3.dat" link="output" register="false" transfer="true" optional="false" type="data" size="10485760"/>
+  </job>
+  <job id="Task_4" namespace="Excel" name="Task" version="1.0" runtime="71.00">
+    <uses file="in_Task_4.dat" link="input" register="false" transfer="true" optional="false" type="data" size="81788928"/>
+    <uses file="out_Task_4.dat" link="output" register="false" transfer="true" optional="false" type="data" size="103809024"/>
+  </job>
+  <job id="Task_5" namespace="Excel" name="Task" version="1.0" runtime="92.00">
+    <uses file="in_Task_5.dat" link="input" register="false" transfer="true" optional="false" type="data" size="62914560"/>
+    <uses file="out_Task_5.dat" link="output" register="false" transfer="true" optional="false" type="data" size="20971520"/>
+  </job>
+  <job id="Task_6" namespace="Excel" name="Task" version="1.0" runtime="36.00">
+    <uses file="in_Task_6.dat" link="input" register="false" transfer="true" optional="false" type="data" size="94371840"/>
+    <uses file="out_Task_6.dat" link="output" register="false" transfer="true" optional="false" type="data" size="32505856"/>
+  </job>
+  <job id="Task_7" namespace="Excel" name="Task" version="1.0" runtime="21.00">
+    <uses file="in_Task_7.dat" link="input" register="false" transfer="true" optional="false" type="data" size="39845888"/>
+    <uses file="out_Task_7.dat" link="output" register="false" transfer="true" optional="false" type="data" size="58720256"/>
+  </job>
+  <job id="Task_8" namespace="Excel" name="Task" version="1.0" runtime="72.00">
+    <uses file="in_Task_8.dat" link="input" register="false" transfer="true" optional="false" type="data" size="103809024"/>
+    <uses file="out_Task_8.dat" link="output" register="false" transfer="true" optional="false" type="data" size="45088768"/>
+  </job>
+  <job id="Task_9" namespace="Excel" name="Task" version="1.0" runtime="33.00">
+    <uses file="in_Task_9.dat" link="input" register="false" transfer="true" optional="false" type="data" size="84934656"/>
+    <uses file="out_Task_9.dat" link="output" register="false" transfer="true" optional="false" type="data" size="73400320"/>
+  </job>
+  <job id="Task_10" namespace="Excel" name="Task" version="1.0" runtime="14.00">
+    <uses file="in_Task_10.dat" link="input" register="false" transfer="true" optional="false" type="data" size="44040192"/>
+    <uses file="out_Task_10.dat" link="output" register="false" transfer="true" optional="false" type="data" size="85983232"/>
+  </job>
+  <job id="Task_11" namespace="Excel" name="Task" version="1.0" runtime="48.00">
+    <uses file="in_Task_11.dat" link="input" register="false" transfer="true" optional="false" type="data" size="15728640"/>
+    <uses file="out_Task_11.dat" link="output" register="false" transfer="true" optional="false" type="data" size="89128960"/>
+  </job>
+  <job id="Task_12" namespace="Excel" name="Task" version="1.0" runtime="96.00">
+    <uses file="in_Task_12.dat" link="input" register="false" transfer="true" optional="false" type="data" size="83886080"/>
+    <uses file="out_Task_12.dat" link="output" register="false" transfer="true" optional="false" type="data" size="76546048"/>
+  </job>
+  <job id="Task_13" namespace="Excel" name="Task" version="1.0" runtime="47.00">
+    <uses file="in_Task_13.dat" link="input" register="false" transfer="true" optional="false" type="data" size="102760448"/>
+    <uses file="out_Task_13.dat" link="output" register="false" transfer="true" optional="false" type="data" size="61865984"/>
+  </job>
+  <job id="Task_14" namespace="Excel" name="Task" version="1.0" runtime="76.00">
+    <uses file="in_Task_14.dat" link="input" register="false" transfer="true" optional="false" type="data" size="101711872"/>
+    <uses file="out_Task_14.dat" link="output" register="false" transfer="true" optional="false" type="data" size="67108864"/>
+  </job>
+  <job id="Task_15" namespace="Excel" name="Task" version="1.0" runtime="1.00">
+    <uses file="in_Task_15.dat" link="input" register="false" transfer="true" optional="false" type="data" size="53477376"/>
+    <uses file="out_Task_15.dat" link="output" register="false" transfer="true" optional="false" type="data" size="60817408"/>
+  </job>
+  <job id="Task_16" namespace="Excel" name="Task" version="1.0" runtime="20.00">
+    <uses file="in_Task_16.dat" link="input" register="false" transfer="true" optional="false" type="data" size="103809024"/>
+    <uses file="out_Task_16.dat" link="output" register="false" transfer="true" optional="false" type="data" size="52428800"/>
+  </job>
+  <job id="Task_17" namespace="Excel" name="Task" version="1.0" runtime="91.00">
+    <uses file="in_Task_17.dat" link="input" register="false" transfer="true" optional="false" type="data" size="104857600"/>
+    <uses file="out_Task_17.dat" link="output" register="false" transfer="true" optional="false" type="data" size="90177536"/>
+  </job>
+  <job id="Task_18" namespace="Excel" name="Task" version="1.0" runtime="80.00">
+    <uses file="in_Task_18.dat" link="input" register="false" transfer="true" optional="false" type="data" size="13631488"/>
+    <uses file="out_Task_18.dat" link="output" register="false" transfer="true" optional="false" type="data" size="15728640"/>
+  </job>
+  <job id="Task_19" namespace="Excel" name="Task" version="1.0" runtime="51.00">
+    <uses file="in_Task_19.dat" link="input" register="false" transfer="true" optional="false" type="data" size="41943040"/>
+    <uses file="out_Task_19.dat" link="output" register="false" transfer="true" optional="false" type="data" size="89128960"/>
+  </job>
+  <job id="Task_20" namespace="Excel" name="Task" version="1.0" runtime="16.00">
+    <uses file="in_Task_20.dat" link="input" register="false" transfer="true" optional="false" type="data" size="51380224"/>
+    <uses file="out_Task_20.dat" link="output" register="false" transfer="true" optional="false" type="data" size="28311552"/>
+  </job>
+  <job id="Task_21" namespace="Excel" name="Task" version="1.0" runtime="78.00">
+    <uses file="in_Task_21.dat" link="input" register="false" transfer="true" optional="false" type="data" size="97517568"/>
+    <uses file="out_Task_21.dat" link="output" register="false" transfer="true" optional="false" type="data" size="104857600"/>
+  </job>
+  <job id="Task_22" namespace="Excel" name="Task" version="1.0" runtime="19.00">
+    <uses file="in_Task_22.dat" link="input" register="false" transfer="true" optional="false" type="data" size="57671680"/>
+    <uses file="out_Task_22.dat" link="output" register="false" transfer="true" optional="false" type="data" size="50331648"/>
+  </job>
+  <job id="Task_23" namespace="Excel" name="Task" version="1.0" runtime="43.00">
+    <uses file="in_Task_23.dat" link="input" register="false" transfer="true" optional="false" type="data" size="75497472"/>
+    <uses file="out_Task_23.dat" link="output" register="false" transfer="true" optional="false" type="data" size="69206016"/>
+  </job>
+  <job id="Task_24" namespace="Excel" name="Task" version="1.0" runtime="38.00">
+    <uses file="in_Task_24.dat" link="input" register="false" transfer="true" optional="false" type="data" size="47185920"/>
+    <uses file="out_Task_24.dat" link="output" register="false" transfer="true" optional="false" type="data" size="73400320"/>
+  </job>
+  <job id="Task_25" namespace="Excel" name="Task" version="1.0" runtime="100.00">
+    <uses file="in_Task_25.dat" link="input" register="false" transfer="true" optional="false" type="data" size="104857600"/>
+    <uses file="out_Task_25.dat" link="output" register="false" transfer="true" optional="false" type="data" size="73400320"/>
+  </job>
+  <job id="Task_26" namespace="Excel" name="Task" version="1.0" runtime="83.00">
+    <uses file="in_Task_26.dat" link="input" register="false" transfer="true" optional="false" type="data" size="52428800"/>
+    <uses file="out_Task_26.dat" link="output" register="false" transfer="true" optional="false" type="data" size="22020096"/>
+  </job>
+  <job id="Task_27" namespace="Excel" name="Task" version="1.0" runtime="88.00">
+    <uses file="in_Task_27.dat" link="input" register="false" transfer="true" optional="false" type="data" size="58720256"/>
+    <uses file="out_Task_27.dat" link="output" register="false" transfer="true" optional="false" type="data" size="11534336"/>
+  </job>
+  <job id="Task_28" namespace="Excel" name="Task" version="1.0" runtime="64.00">
+    <uses file="in_Task_28.dat" link="input" register="false" transfer="true" optional="false" type="data" size="100663296"/>
+    <uses file="out_Task_28.dat" link="output" register="false" transfer="true" optional="false" type="data" size="33554432"/>
+  </job>
+  <job id="Task_29" namespace="Excel" name="Task" version="1.0" runtime="26.00">
+    <uses file="in_Task_29.dat" link="input" register="false" transfer="true" optional="false" type="data" size="92274688"/>
+    <uses file="out_Task_29.dat" link="output" register="false" transfer="true" optional="false" type="data" size="40894464"/>
+  </job>
+  <job id="Task_30" namespace="Excel" name="Task" version="1.0" runtime="65.00">
+    <uses file="in_Task_30.dat" link="input" register="false" transfer="true" optional="false" type="data" size="74448896"/>
+    <uses file="out_Task_30.dat" link="output" register="false" transfer="true" optional="false" type="data" size="26214400"/>
+  </job>
+  <job id="Task_31" namespace="Excel" name="Task" version="1.0" runtime="61.00">
+    <uses file="in_Task_31.dat" link="input" register="false" transfer="true" optional="false" type="data" size="104857600"/>
+    <uses file="out_Task_31.dat" link="output" register="false" transfer="true" optional="false" type="data" size="13631488"/>
+  </job>
+  <job id="Task_32" namespace="Excel" name="Task" version="1.0" runtime="74.00">
+    <uses file="in_Task_32.dat" link="input" register="false" transfer="true" optional="false" type="data" size="100663296"/>
+    <uses file="out_Task_32.dat" link="output" register="false" transfer="true" optional="false" type="data" size="95420416"/>
+  </job>
+  <job id="Task_33" namespace="Excel" name="Task" version="1.0" runtime="68.00">
+    <uses file="in_Task_33.dat" link="input" register="false" transfer="true" optional="false" type="data" size="102760448"/>
+    <uses file="out_Task_33.dat" link="output" register="false" transfer="true" optional="false" type="data" size="76546048"/>
+  </job>
+  <job id="Task_34" namespace="Excel" name="Task" version="1.0" runtime="37.00">
+    <uses file="in_Task_34.dat" link="input" register="false" transfer="true" optional="false" type="data" size="10485760"/>
+    <uses file="out_Task_34.dat" link="output" register="false" transfer="true" optional="false" type="data" size="26214400"/>
+  </job>
+  <job id="Task_35" namespace="Excel" name="Task" version="1.0" runtime="12.00">
+    <uses file="in_Task_35.dat" link="input" register="false" transfer="true" optional="false" type="data" size="15728640"/>
+    <uses file="out_Task_35.dat" link="output" register="false" transfer="true" optional="false" type="data" size="50331648"/>
+  </job>
+  <job id="Task_36" namespace="Excel" name="Task" version="1.0" runtime="14.00">
+    <uses file="in_Task_36.dat" link="input" register="false" transfer="true" optional="false" type="data" size="58720256"/>
+    <uses file="out_Task_36.dat" link="output" register="false" transfer="true" optional="false" type="data" size="28311552"/>
+  </job>
+  <job id="Task_37" namespace="Excel" name="Task" version="1.0" runtime="22.00">
+    <uses file="in_Task_37.dat" link="input" register="false" transfer="true" optional="false" type="data" size="88080384"/>
+    <uses file="out_Task_37.dat" link="output" register="false" transfer="true" optional="false" type="data" size="91226112"/>
+  </job>
+  <job id="Task_38" namespace="Excel" name="Task" version="1.0" runtime="82.00">
+    <uses file="in_Task_38.dat" link="input" register="false" transfer="true" optional="false" type="data" size="84934656"/>
+    <uses file="out_Task_38.dat" link="output" register="false" transfer="true" optional="false" type="data" size="94371840"/>
+  </job>
+  <job id="Task_39" namespace="Excel" name="Task" version="1.0" runtime="29.00">
+    <uses file="in_Task_39.dat" link="input" register="false" transfer="true" optional="false" type="data" size="44040192"/>
+    <uses file="out_Task_39.dat" link="output" register="false" transfer="true" optional="false" type="data" size="26214400"/>
+  </job>
+  <job id="Task_40" namespace="Excel" name="Task" version="1.0" runtime="43.00">
+    <uses file="in_Task_40.dat" link="input" register="false" transfer="true" optional="false" type="data" size="88080384"/>
+    <uses file="out_Task_40.dat" link="output" register="false" transfer="true" optional="false" type="data" size="35651584"/>
+  </job>
+</adag>
